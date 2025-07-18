@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Users from './pages/Users';
 import Layout from './layouts/Layout';
 import authService from './services/authService';
 
@@ -17,6 +18,13 @@ export default function App() {
           <PrivateRoute>
             <Layout>
               <Dashboard />
+            </Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/users" element={
+          <PrivateRoute>
+            <Layout>
+              <Users />
             </Layout>
           </PrivateRoute>
         } />
