@@ -1,0 +1,110 @@
+/* -----------------------------
+   Estilo general para la tabla
+------------------------------ */
+
+/* Encabezado de tabla en modo claro */
+.table-custom th {
+  background-color: #f8f9fa; 
+}
+
+/* Bordes de la tabla en modo claro */
+.table-custom td, 
+.table-custom th {
+  border-color: #d2d2d2; 
+}
+
+/* -----------------------------
+   Modo Oscuro: Tabla en pantallas grandes y medianas
+------------------------------ */
+.dark-mode .table-custom {
+  background-color: #555151; 
+  color: #ffffff;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0; 
+}
+
+/* Encabezado en modo oscuro */
+.dark-mode .table-custom th {
+  background-color: #777474; 
+  color: #ffffff;
+}
+
+/* Celdas y encabezados: fondo y bordes en modo oscuro */
+.dark-mode .table-custom td, 
+.dark-mode .table-custom th {
+  background-color: #555151; 
+  border-color: #d2d2d2;     
+  color: #ffffff;
+}
+
+/* -----------------------------
+   Acordeón en pantallas pequeñas
+------------------------------ */
+
+/* Cabecera del acordeón en modo claro */
+.accordion-header {
+  cursor: pointer;
+  background-color: #f1f1f1; 
+  padding: 0.75rem;
+  border: 1px solid #d2d2d2;
+  border-radius: 0.5rem;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Cabecera del acordeón en modo oscuro */
+.dark-mode .accordion-header {
+  background-color: #555151; 
+  color: #ffffff;
+  border: 1px solid #d2d2d2;
+}
+
+/* Icono de flecha en acordeón */
+.accordion-toggle {
+  font-size: 1rem;
+}
+
+/* -----------------------------
+   Cuerpo del acordeón desplegado
+------------------------------ */
+.accordion-body {
+  background-color: #ffffff;
+  border: 1px solid #d2d2d2;
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  padding: 0.75rem;
+}
+
+/* Acordeón en modo oscuro */
+.dark-mode .accordion-body {
+  background-color: #555151;
+  color: #ffffff;
+  border-color: #d2d2d2;
+}
+
+.accordion-body p {
+  margin-bottom: 0.5rem;
+}
+
+.accordion-actions {
+  margin-top: 0.75rem;
+}
+
+/* -----------------------------
+   Ajustes para tarjetas en móviles
+------------------------------ */
+.card.mb-2 {
+  border: none;
+  background-color: transparent;
+}
+
+/* Tarjeta en modo oscuro */
+.dark-mode .card {
+  background-color: #555151;
+  border: 1px solid #d2d2d2;
+  border-radius: 0.5rem;
+}

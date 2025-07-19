@@ -1,11 +1,38 @@
 // Botones de acción para cada fila de la tabla: Ver, Editar y Eliminar
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEdit, faTrashCan} from '@fortawesome/free-solid-svg-icons'; 
+import '../styles/ActionButtons.css';
+
 export default function ActionButtons({ onView, onEdit, onDelete }) {
   return (
-    <div className="btn-group">
-      <button className="btn btn-info btn-sm" onClick={onView}>Ver</button>
-      <button className="btn btn-warning btn-sm" onClick={onEdit}>Editar</button>
-      <button className="btn btn-danger btn-sm" onClick={onDelete}>Eliminar</button>
+    <div className="d-flex gap-2">
+      <button
+        onClick={onView}
+        className="btn btn-link p-0"
+        title="Ver"
+        aria-label="Ver"
+      >
+        <FontAwesomeIcon icon={faEye} className="icon-eye" />
+      </button>
+
+      <button
+        onClick={onEdit}
+        className="btn btn-link p-0"
+        title="Editar"
+        aria-label="Editar"
+      >
+        <FontAwesomeIcon icon={faEdit} className="icon-edit" />
+      </button>
+
+      <button
+        onClick={onDelete}
+        className="btn btn-link p-0"
+        title="Eliminar"
+        aria-label="Eliminar"
+      >
+        <FontAwesomeIcon icon={faTrashCan} className="icon-delete" />
+      </button>
     </div>
   );
 }

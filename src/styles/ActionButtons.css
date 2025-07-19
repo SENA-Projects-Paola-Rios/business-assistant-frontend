@@ -1,0 +1,14 @@
+.icon-eye {
+  color: #00C907; /* Verde */
+  filter: drop-shadow(0 0 3px black);
+}
+
+.icon-edit {
+  color: #FFE100; /* Amarillo */
+  filter: drop-shadow(0 0 3px black);
+}
+
+.icon-delete {
+  color: #F92D31;
+  filter: drop-shadow(0 0 3px black);
+}

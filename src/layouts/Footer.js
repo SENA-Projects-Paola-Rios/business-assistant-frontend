@@ -1,6 +1,9 @@
+/**
+ * Componente Footer fijo en la parte inferior de la página.
+ */
 export default function Footer() {
   return (
-    <footer className="bg-dark text-white p-3 text-center mt-auto">
+    <footer className="footer text-center mt-auto">
       © 2025 Business Assistant Supermarket
     </footer>
   );

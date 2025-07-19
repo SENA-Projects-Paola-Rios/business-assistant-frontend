@@ -1,3 +1,5 @@
+import '../styles/ModalForm.css';  
+
 // Este componente genera un modal reutilizable para crear, editar o ver registros
 
 export default function ModalForm({ show, onClose, mode, fields, onChange, onSave }) {
@@ -13,43 +15,45 @@ export default function ModalForm({ show, onClose, mode, fields, onChange, onSav
   }[mode]; // seleccionamos el valor correspondiente al modo actual
 
   return (
-    <div className="modal show d-block" tabIndex="-1">
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">{title}</h5>
-            <button type="button" className="btn-close" onClick={onClose}></button>
-          </div>
-          <div className="modal-body">
-            {mode === 'view' ? (
-            // Si el modo es 'view', mostramos los campos como texto (sin inputs)
-              <div>
-                {fields.map((field, idx) => (
-                  <p key={idx}><strong>{field.label}:</strong> {field.value}</p>
-                ))}
-              </div>
-            ) : (
+    <div className="custom-modal-backdrop">
+      <div className="modal show d-block" tabIndex="-1">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">{title}</h5>
+              <button type="button" className="btn-close" onClick={onClose}></button>
+            </div>
+            <div className="modal-body">
+              {mode === 'view' ? (
+              // Si el modo es 'view', mostramos los campos como texto (sin inputs)
+                <div>
+                  {fields.map((field, idx) => (
+                    <p key={idx}><strong>{field.label}:</strong> {field.value}</p>
+                  ))}
+                </div>
+              ) : (
 
-            // Si el modo es 'edit' o 'add', renderizamos un formulario editable
-              <form>
-                {fields.map((field, idx) => (
-                  <div className="mb-3" key={idx}>
-                    <label>{field.label}</label>
-                    <input
-                      type={field.type}
-                      className="form-control"
-                      value={field.value}
-                      onChange={(e) => onChange(field.name, e.target.value)}
-                    />
-                  </div>
-                ))}
-              </form>
-            )}
-          </div>
-          <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
-            {/* Si NO estamos en modo vista, mostramos el botón de guardar */}
-            {mode !== 'view' && <button className="btn btn-primary" onClick={onSave}>Guardar</button>}
+              // Si el modo es 'edit' o 'add', renderizamos un formulario editable
+                <form>
+                  {fields.map((field, idx) => (
+                    <div className="mb-3" key={idx}>
+                      <label>{field.label}</label>
+                      <input
+                        type={field.type}
+                        className="form-control"
+                        value={field.value}
+                        onChange={(e) => onChange(field.name, e.target.value)}
+                      />
+                    </div>
+                  ))}
+                </form>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+              {/* Si NO estamos en modo vista, mostramos el botón de guardar */}
+              {mode !== 'view' && <button className="btn btn-primary" onClick={onSave}>Guardar</button>}
+            </div>
           </div>
         </div>
       </div>
