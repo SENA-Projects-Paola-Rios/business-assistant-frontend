@@ -1,12 +1,21 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartShopping, faHome, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping, faHome, faUsers, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import authService from '../services/authService';
 
 /**
  * Sidebar lateral, siempre visible en pantallas grandes.
  * En móviles funciona como menú colapsable.
  */
 export default function Sidebar({ onClose }) {
+  const navigate = useNavigate();
+
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    authService.logout();
+    navigate('/');  // Redirige al login
+  };
+
   return (
     <aside className="sidebar p-3">
       {/* Logo completo SOLO visible en pantallas grandes */}
@@ -45,6 +54,16 @@ export default function Sidebar({ onClose }) {
           <Link className="sidebar-link" to="/users">
             <FontAwesomeIcon icon={faUsers} />
             Usuarios
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link
+            className="sidebar-link"
+            to="/login"
+            onClick={handleLogout}
+          >
+            <FontAwesomeIcon icon={faRightFromBracket} />
+            Cerrar Sesión
           </Link>
         </li>
       </ul>

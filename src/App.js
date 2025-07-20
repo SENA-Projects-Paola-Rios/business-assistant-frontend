@@ -28,6 +28,13 @@ export default function App() {
             </Layout>
           </PrivateRoute>
         } />
+        <Route path="/login" element={
+          <PrivateRoute>
+            <Layout>
+              <Login />
+            </Layout>
+          </PrivateRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );

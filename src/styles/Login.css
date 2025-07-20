@@ -1,0 +1,95 @@
+/* Contenedor principal con flexbox para centrar todo */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Estilos modo claro */
+.light-mode-login {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* Estilos modo oscuro */
+.dark-mode-login {
+  background-color: #535252;
+  color: #e0e0e0;
+}
+
+/* Botón modo claro/oscuro en la esquina superior derecha */
+.theme-toggle-btn-login {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  background-color: #000;
+  color: #fff;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* Caja del login */
+.login-box {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.dark-mode-login .login-box {
+  background-color: #1e1e1e;
+}
+
+/* Logo */
+.login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-logo h2 {
+  font-weight: bold;
+}
+
+.login-logo small {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.login-logo p {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Formulario */
+.login-form .form-control {
+  border-radius: 0.5rem;
+}
+
+.forgot-password {
+  cursor: pointer;
+}
+
+/* Botón ingresar */
+.btn-ingresar {
+  border-radius: 50px;
+}
+
+/* Responsive para pantallas muy grandes */
+@media (min-width: 1200px) {
+  .login-box {
+    max-width: 450px;
+  }
+}
