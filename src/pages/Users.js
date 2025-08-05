@@ -104,6 +104,7 @@ export default function Users() {
       <ListTable 
         headers={tableHeaders}   // pasamos los headers como arreglo de objetos dinámico
         data={users}
+        accordionHeaderKey="email"
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
+import Categories from './pages/Categories';
 import Layout from './layouts/Layout';
 import authService from './services/authService';
 
@@ -25,6 +26,13 @@ export default function App() {
           <PrivateRoute>
             <Layout>
               <Users />
+            </Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/categories" element={
+          <PrivateRoute>
+            <Layout>
+              <Categories />
             </Layout>
           </PrivateRoute>
         } />

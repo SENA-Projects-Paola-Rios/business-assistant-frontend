@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartShopping, faHome, faUsers, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping, faHome, faUsers, faRightFromBracket, faLayerGroup } from '@fortawesome/free-solid-svg-icons';
 import authService from '../services/authService';
 
 /**
@@ -54,6 +54,12 @@ export default function Sidebar({ onClose }) {
           <Link className="sidebar-link" to="/users">
             <FontAwesomeIcon icon={faUsers} />
             Usuarios
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link className="sidebar-link" to="/categories">
+            <FontAwesomeIcon icon={faLayerGroup} />
+            Categorias
           </Link>
         </li>
         <li className="nav-item">

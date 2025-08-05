@@ -9,8 +9,9 @@ import '../styles/ListTable.css';  // Importamos los estilos externos
  * @param {Function} onView - Función para ver un registro.
  * @param {Function} onEdit - Función para editar un registro.
  * @param {Function} onDelete - Función para eliminar un registro.
+ * @param {string} accordionHeaderKey - Clave del campo que se usará como título del acordeón en móviles.
  */
-export default function ListTable({ headers, data, onView, onEdit, onDelete }) {
+export default function ListTable({ headers, data, onView, onEdit, onDelete, accordionHeaderKey}) {
   // Estado para controlar qué item está expandido en el acordeón (para móviles)
   const [openItem, setOpenItem] = useState(null);
 
@@ -61,7 +62,7 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete }) {
               onClick={() => toggleAccordion(item.id)}
             >
               {/* Personalizamos el encabezado del acordeón*/}
-              <span>{item.email}</span>
+              <span>{item[accordionHeaderKey]}</span>
               <span className="accordion-toggle">{openItem === item.id ? '▲' : '▼'}</span>
             </div>
 
