@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartShopping, faHome, faUsers, faRightFromBracket, faLayerGroup, faList, faTableCells } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping, faHome, faUsers, faRightFromBracket, faLayerGroup, faList, faTableCells, faMoneyCheckDollar } from '@fortawesome/free-solid-svg-icons';
 import authService from '../services/authService';
+import { faMoneyBillTrendUp } from '@fortawesome/free-solid-svg-icons/faMoneyBillTrendUp';
 
 /**
  * Sidebar lateral, siempre visible en pantallas grandes.
@@ -72,6 +73,18 @@ export default function Sidebar({ onClose }) {
           <Link className="sidebar-link" to="/lots">
             <FontAwesomeIcon icon={faTableCells} />
             Lotes
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link className="sidebar-link" to="/sales">
+            <FontAwesomeIcon icon={faMoneyBillTrendUp} />
+            Ventas
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link className="sidebar-link" to="/sale-details">
+            <FontAwesomeIcon icon={faMoneyCheckDollar} />
+            Detalles de Venta
           </Link>
         </li>
         <li className="nav-item">

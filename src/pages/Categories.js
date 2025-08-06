@@ -4,7 +4,7 @@ import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
 import ModalForm from '../components/ModalForm';
 import ModalConfirmation from '../components/ModalConfirmation';
-import CategoryService from '../services/Category';
+import CategoryService from '../services/CategoryService';
 
 // Componente principal que gestiona las categorías (listar, crear, editar, eliminar)
 export default function Categories() {
@@ -107,7 +107,7 @@ export default function Categories() {
       <ListTable
         headers={tableHeaders}
         data={categories}
-        accordionHeaderKey="name"
+        accordionHeaderKey={(item) => `${item.id} - ${item.name}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}

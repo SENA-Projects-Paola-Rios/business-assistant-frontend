@@ -4,9 +4,9 @@ import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
 import ModalForm from '../components/ModalForm';
 import ModalConfirmation from '../components/ModalConfirmation';
-import ProductService from '../services/Product';
-import CategoryService from '../services/Category';
-import LotService from '../services/Lot';
+import ProductService from '../services/ProductService';
+import CategoryService from '../services/CategoryService';
+import LotService from '../services/LotService';
 
 // Componente principal para la gestión de productos
 export default function Products() {
@@ -138,7 +138,7 @@ export default function Products() {
       <ListTable
         headers={tableHeaders}
         data={products}
-        accordionHeaderKey="name"
+        accordionHeaderKey={(item) => `${item.name} - ${item.manufacturer_lot}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}

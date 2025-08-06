@@ -4,18 +4,20 @@ import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
 import ModalForm from '../components/ModalForm';
 import ModalConfirmation from '../components/ModalConfirmation';
-import LotService from '../services/Lot';
-import ProductService from '../services/Product';
+import LotService from '../services/LotService';
+import ProductService from '../services/ProductService';
 
 // Componente principal para la gestión de lotes
 export default function Lots() {
+  
   const [lots, setLots] = useState(LotService.getAll());
   const [products] = useState(ProductService.getAll());
-
   const [selectedLot, setSelectedLot] = useState(null);
   const [mode, setMode] = useState('view');
+
   const [showForm, setShowForm] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
   const [formFields, setFormFields] = useState([]);
 
   // Encabezados de la tabla de lotes
@@ -24,6 +26,7 @@ export default function Lots() {
     { key: 'manufacturer_lot', label: 'Lote Fabricante' },
     { key: 'expiration_date', label: 'Fecha de Vencimiento' },
     { key: 'stock', label: 'Stock' },
+    { key: 'unit_price', label: 'Precio Unitario' }, 
     { key: 'product_name', label: 'Producto' },
   ];
 
@@ -33,6 +36,7 @@ export default function Lots() {
       { name: 'manufacturer_lot', label: 'Lote Fabricante', type: 'text', value: lot.manufacturer_lot || '' },
       { name: 'expiration_date', label: 'Fecha de Vencimiento', type: 'date', value: lot.expiration_date || '' },
       { name: 'stock', label: 'Stock', type: 'number', value: lot.stock || 0 },
+      { name: 'unit_price', label: 'Precio Unitario', type: 'number', value: lot.unit_price || 0 }, // ✅ Campo agregado
       {
         name: 'product_id',
         label: 'Producto',
@@ -51,7 +55,7 @@ export default function Lots() {
     setShowForm(true);
   };
 
-  // Edición
+  // Edición 
   const handleEdit = (lot) => {
     setSelectedLot(lot);
     setFormFields(buildFormFields(lot));
@@ -61,7 +65,7 @@ export default function Lots() {
 
   // Agregar nuevo
   const handleAdd = () => {
-    const emptyLot = { manufacturer_lot: '', expiration_date: '', stock: 0, product_id: '' };
+    const emptyLot = { manufacturer_lot: '', expiration_date: '', stock: 0, unit_price: 0, product_id: '' };
     setSelectedLot(emptyLot);
     setFormFields(buildFormFields(emptyLot));
     setMode('add');
@@ -86,12 +90,15 @@ export default function Lots() {
   // Guardar lote nuevo o actualizado
   const handleSave = () => {
     const lotData = formFields.reduce((acc, field) => {
-      acc[field.name] = field.value;
+      // Convierte valores numéricos apropiadamente
+      acc[field.name] = field.type === 'number' ? parseFloat(field.value) : field.value;
       return acc;
     }, {});
 
+    // Asegura que el product_id sea entero
     lotData.product_id = parseInt(lotData.product_id, 10);
 
+    // Busca el nombre del producto para mostrarlo en la tabla
     const product = products.find(p => p.id === lotData.product_id);
     lotData.product_name = product?.name || '';
 
@@ -104,7 +111,7 @@ export default function Lots() {
     setLots([...LotService.getAll()]);
     setShowForm(false);
   };
-
+  
   // Confirmar eliminación
   const confirmDelete = () => {
     LotService.delete(selectedLot.id);
@@ -122,7 +129,7 @@ export default function Lots() {
       <ListTable
         headers={tableHeaders}
         data={lots}
-        accordionHeaderKey="manufacturer_lot"
+        accordionHeaderKey={(item) => `${item.id} - ${item.manufacturer_lot}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}

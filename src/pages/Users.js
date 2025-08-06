@@ -4,7 +4,7 @@ import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
 import ModalForm from '../components/ModalForm';
 import ModalConfirmation from '../components/ModalConfirmation';
-import UserService from '../services/User';
+import UserService from '../services/UserService';
 
 // Este componente representa la página de Usuarios, con listado, creación, edición, vista y eliminación de usuarios
 export default function Users() {
@@ -104,7 +104,7 @@ export default function Users() {
       <ListTable 
         headers={tableHeaders}   // pasamos los headers como arreglo de objetos dinámico
         data={users}
-        accordionHeaderKey="email"
+        accordionHeaderKey={(item) => `${item.nombre} - ${item.email}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}

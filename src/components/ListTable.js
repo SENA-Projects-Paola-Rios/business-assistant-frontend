@@ -4,14 +4,14 @@ import '../styles/ListTable.css';  // Importamos los estilos externos
 
 /**
  * Componente de tabla reutilizable y dinámico.
- * @param {Array} headers - Arreglo de objetos { key, label } para definir columnas.
+ * @param {Array} headers - Arreglo de objetos { key, label, render? } para definir columnas.
  * @param {Array} data - Datos a renderizar en la tabla.
  * @param {Function} onView - Función para ver un registro.
  * @param {Function} onEdit - Función para editar un registro.
  * @param {Function} onDelete - Función para eliminar un registro.
  * @param {string} accordionHeaderKey - Clave del campo que se usará como título del acordeón en móviles.
  */
-export default function ListTable({ headers, data, onView, onEdit, onDelete, accordionHeaderKey}) {
+export default function ListTable({ headers, data, onView, onEdit, onDelete, accordionHeaderKey }) {
   // Estado para controlar qué item está expandido en el acordeón (para móviles)
   const [openItem, setOpenItem] = useState(null);
 
@@ -36,15 +36,17 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete, acc
         <tbody>
           {data.map((item) => (
             <tr key={item.id || item.key}>
-              {/* Renderizamos dinámicamente cada valor del objeto usando la 'key' definida en headers */}
+              {/* Renderizamos dinámicamente cada valor del objeto o función render usando la 'key' definida en headers */}
               {headers.map((header, idx) => (
-                <td key={idx}>{item[header.key]}</td>
+                <td key={idx}>
+                  {header.render ? header.render(item) : item[header.key]}
+                </td>
               ))}
               <td>
-                <ActionButtons 
-                  onView={() => onView(item)} 
-                  onEdit={() => onEdit(item)} 
-                  onDelete={() => onDelete(item)} 
+                <ActionButtons
+                  onView={() => onView(item)}
+                  onEdit={() => onEdit(item)}
+                  onDelete={() => onDelete(item)}
                 />
               </td>
             </tr>
@@ -62,7 +64,11 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete, acc
               onClick={() => toggleAccordion(item.id)}
             >
               {/* Personalizamos el encabezado del acordeón*/}
-              <span>{item[accordionHeaderKey]}</span>
+              <span>
+                {typeof accordionHeaderKey === 'function'
+                  ? accordionHeaderKey(item)
+                  : item[accordionHeaderKey]}
+              </span>
               <span className="accordion-toggle">{openItem === item.id ? '▲' : '▼'}</span>
             </div>
 
@@ -72,7 +78,7 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete, acc
                 {/* Renderizamos los campos dinámicamente */}
                 {headers.map((header, idx) => (
                   <p key={idx}>
-                    <strong>{header.label}:</strong> {item[header.key]}
+                    <strong>{header.label}:</strong> {header.render ? header.render(item) : item[header.key]}
                   </p>
                 ))}
                 <div className="accordion-actions">
