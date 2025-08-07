@@ -1,0 +1,32 @@
+.custom-select-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.custom-select-label {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.custom-select {
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.dark-mode .custom-select {
+ background-color: #555151;   
+ color: #fff;
+}

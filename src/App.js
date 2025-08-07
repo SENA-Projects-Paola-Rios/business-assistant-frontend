@@ -9,6 +9,7 @@ import Products from './pages/Products';
 import Lots from './pages/Lots';
 import Sales from './pages/Sales';
 import SaleDetails from './pages/SaleDetails';
+import Reports from './pages/Reports';
 
 function PrivateRoute({ children }) {
   return authService.isAuthenticated() ? children : <Navigate to="/" />;
@@ -65,6 +66,13 @@ export default function App() {
           <PrivateRoute>
             <Layout>
               <SaleDetails />
+            </Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/reports" element={
+          <PrivateRoute>
+            <Layout>
+              <Reports />
             </Layout>
           </PrivateRoute>
         } />
