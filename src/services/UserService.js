@@ -1,24 +1,36 @@
-// Lista simulada de usuarios para trabajar sin conexión a API
-
-const mockUsers = [
-  { id: 1, nombre: 'Juan Perez', email: 'juan@example.com', rol: 'Administrador' },
-  { id: 2, nombre: 'Ana Lopez', email: 'ana@example.com', rol: 'Vendedor' },
-];
-
-// Servicio simulado con funciones CRUD
+// src/services/UserService.js
+import api from './api'; // Importamos la instancia configurada con interceptores
 
 const UserService = {
-  getAll: () => mockUsers, 
-  getById: (id) => mockUsers.find(u => u.id === id), 
-  create: (user) => { mockUsers.push({ id: mockUsers.length + 1, ...user }); },
-  update: (id, user) => {
-    const index = mockUsers.findIndex(u => u.id === id);
-    if (index > -1) mockUsers[index] = { ...mockUsers[index], ...user };
+  // Obtener todos los usuarios
+  getAll: async () => {
+    const response = await api.get('/users');
+    return response.data;
   },
-  delete: (id) => {
-    const index = mockUsers.findIndex(u => u.id === id);
-    if (index > -1) mockUsers.splice(index, 1);
+
+  // Obtener un usuario por ID
+  getById: async (id) => {
+    const response = await api.get(`/users/${id}`);
+    return response.data;
   },
+
+  // Crear un usuario
+  create: async (userData) => {
+    const response = await api.post('/users', userData);
+    return response.data;
+  },
+
+  // Actualizar un usuario
+  update: async (id, userData) => {
+    const response = await api.put(`/users/${id}`, userData);
+    return response.data;
+  },
+
+  // Eliminar un usuario
+  delete: async (id) => {
+    const response = await api.delete(`/users/${id}`);
+    return response.data;
+  }
 };
 
 export default UserService;

@@ -15,10 +15,15 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete, acc
   // Estado para controlar qué item está expandido en el acordeón (para móviles)
   const [openItem, setOpenItem] = useState(null);
 
+
   // Alternar el item abierto o cerrado
   const toggleAccordion = (id) => {
     setOpenItem(openItem === id ? null : id);
   };
+
+  // Evitamos romper si headers o data vienen nulos/undefined
+  const safeHeaders = Array.isArray(headers) ? headers : [];
+  const safeData = Array.isArray(data) ? data : [];
 
   return (
     <div>
@@ -26,18 +31,16 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete, acc
       <table className="table table-striped table-custom d-none d-md-table">
         <thead>
           <tr>
-            {/* Generamos cada encabezado según la propiedad 'label' definida en headers */}
-            {headers.map((header, idx) => (
+            {safeHeaders.map((header, idx) => (
               <th key={idx}>{header.label}</th>
             ))}
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
+          {safeData.map((item) => (
             <tr key={item.id || item.key}>
-              {/* Renderizamos dinámicamente cada valor del objeto o función render usando la 'key' definida en headers */}
-              {headers.map((header, idx) => (
+              {safeHeaders.map((header, idx) => (
                 <td key={idx}>
                   {header.render ? header.render(item) : item[header.key]}
                 </td>
@@ -56,14 +59,12 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete, acc
 
       {/* Acordeón para pantallas pequeñas */}
       <div className="d-md-none">
-        {data.map((item) => (
+        {safeData.map((item) => (
           <div className="card mb-2" key={item.id || item.key}>
-            {/* Cabecera clickeable del acordeón */}
             <div
               className="card-header accordion-header d-flex justify-content-between align-items-center"
               onClick={() => toggleAccordion(item.id)}
             >
-              {/* Personalizamos el encabezado del acordeón*/}
               <span>
                 {typeof accordionHeaderKey === 'function'
                   ? accordionHeaderKey(item)
@@ -71,12 +72,9 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete, acc
               </span>
               <span className="accordion-toggle">{openItem === item.id ? '▲' : '▼'}</span>
             </div>
-
-            {/* Si el item es el seleccionado, mostramos su contenido */}
             {openItem === item.id && (
               <div className="card-body accordion-body p-2">
-                {/* Renderizamos los campos dinámicamente */}
-                {headers.map((header, idx) => (
+                {safeHeaders.map((header, idx) => (
                   <p key={idx}>
                     <strong>{header.label}:</strong> {header.render ? header.render(item) : item[header.key]}
                   </p>

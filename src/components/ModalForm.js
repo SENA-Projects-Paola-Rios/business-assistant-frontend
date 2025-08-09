@@ -6,6 +6,7 @@ export default function ModalForm({ show, onClose, mode, fields, onChange, onSav
   // Si la prop show es falsa, el modal no se muestra (retorna null y no renderiza nada)
   if (!show) return null;
 
+
   // Definimos un título que cambia dependiendo del modo en que estamos
   const title = {
     view: 'Detalles',          // si es modo vista
