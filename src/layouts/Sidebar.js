@@ -1,25 +1,30 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartShopping, faHome, faUsers, faRightFromBracket, faLayerGroup, faList, faTableCells, faMoneyCheckDollar, faNewspaper } from '@fortawesome/free-solid-svg-icons';
-import authService from '../services/authService';
+import {
+  faCartShopping,
+  faHome,
+  faUsers,
+  faRightFromBracket,
+  faLayerGroup,
+  faList,
+  faTableCells,
+  faMoneyCheckDollar,
+  faNewspaper
+} from '@fortawesome/free-solid-svg-icons';
 import { faMoneyBillTrendUp } from '@fortawesome/free-solid-svg-icons/faMoneyBillTrendUp';
+import authService from '../services/authService';
 
-/**
- * Sidebar lateral, siempre visible en pantallas grandes.
- * En móviles funciona como menú colapsable.
- */
 export default function Sidebar({ onClose }) {
   const navigate = useNavigate();
 
-  // Función para cerrar sesión
   const handleLogout = () => {
-    authService.logout();
-    navigate('/');  // Redirige al login
+    authService.logout(); // Limpia el token/session del usuario
+    navigate('/login');   // Redirige al login
   };
 
   return (
     <aside className="sidebar p-3">
-      {/* Logo completo SOLO visible en pantallas grandes */}
+      {/* Logo completo en pantallas grandes */}
       <div className="app-logo d-none d-md-flex align-items-center justify-content-center mb-4">
         <FontAwesomeIcon icon={faCartShopping} size="2x" className="me-2" />
         <div className="text-container">
@@ -28,7 +33,7 @@ export default function Sidebar({ onClose }) {
         </div>
       </div>
 
-      {/* Logo + botón cerrar SOLO visible en móviles */}
+      {/* Logo + botón cerrar en móviles */}
       <div className="d-flex justify-content-between align-items-center mb-3 d-md-none">
         <div className="app-logo d-flex align-items-center">
           <FontAwesomeIcon icon={faCartShopping} size="2x" className="me-2" />
@@ -60,7 +65,7 @@ export default function Sidebar({ onClose }) {
         <li className="nav-item">
           <Link className="sidebar-link" to="/categories">
             <FontAwesomeIcon icon={faLayerGroup} />
-            Categorias
+            Categorías
           </Link>
         </li>
         <li className="nav-item">
@@ -93,15 +98,16 @@ export default function Sidebar({ onClose }) {
             Reportes
           </Link>
         </li>
+        {/* Botón de cerrar sesión */}
         <li className="nav-item">
-          <Link
-            className="sidebar-link"
-            to="/login"
+          <button
+            className="sidebar-link btn btn-link w-100 text-start"
             onClick={handleLogout}
+            style={{ textDecoration: 'none' }}
           >
             <FontAwesomeIcon icon={faRightFromBracket} />
             Cerrar Sesión
-          </Link>
+          </button>
         </li>
       </ul>
     </aside>

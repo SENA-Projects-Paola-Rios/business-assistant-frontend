@@ -10,9 +10,10 @@ export default function Login() {
   const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (authService.login(credentials)) {
+    const success = await authService.login(credentials);
+    if (success) {
       navigate('/dashboard');
     } else {
       alert('Credenciales inválidas');
