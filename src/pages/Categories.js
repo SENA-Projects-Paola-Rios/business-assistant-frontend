@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// src/pages/Categories.js
+import { useState, useEffect } from 'react';
 import SectionTitle from '../components/SectionTitle';
 import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
@@ -6,32 +7,40 @@ import ModalForm from '../components/ModalForm';
 import ModalConfirmation from '../components/ModalConfirmation';
 import CategoryService from '../services/CategoryService';
 
-// Componente principal que gestiona las categorías (listar, crear, editar, eliminar)
 export default function Categories() {
-
-  const [categories, setCategories] = useState(CategoryService.getAll());
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [mode, setMode] = useState('view');
   const [showForm, setShowForm] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [formFields, setFormFields] = useState([]);
 
-  // Encabezados de la tabla de categorías
+  // Encabezados de la tabla
   const tableHeaders = [
     { key: 'id', label: 'ID' },
     { key: 'name', label: 'Nombre' },
     { key: 'description', label: 'Descripción' },
   ];
 
-  // Construye los campos del formulario según la categoría actual
-  const buildFormFields = (category) => {
-    return [
-      { name: 'name', label: 'Nombre', type: 'text', value: category.name || '' },
-      { name: 'description', label: 'Descripción', type: 'text', value: category.description || '' },
-    ];
+  // Cargar categorías al montar
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const res = await CategoryService.getAll();
+      setCategories(res);
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
+    }
   };
 
-  // Ver detalles de una categoría (modo solo lectura)
+  const buildFormFields = (category) => [
+    { name: 'name', label: 'Nombre', type: 'text', value: category.name || '' },
+    { name: 'description', label: 'Descripción', type: 'text', value: category.description || '' },
+  ];
+
   const handleView = (category) => {
     setSelectedCategory(category);
     setFormFields(buildFormFields(category));
@@ -39,7 +48,6 @@ export default function Categories() {
     setShowForm(true);
   };
 
-  // Editar una categoría existente
   const handleEdit = (category) => {
     setSelectedCategory(category);
     setFormFields(buildFormFields(category));
@@ -47,7 +55,6 @@ export default function Categories() {
     setShowForm(true);
   };
 
-  // Agregar una nueva categoría
   const handleAdd = () => {
     const emptyCategory = { name: '', description: '' };
     setSelectedCategory(emptyCategory);
@@ -56,13 +63,11 @@ export default function Categories() {
     setShowForm(true);
   };
 
-  // Eliminar una categoría (mostrar modal de confirmación)
   const handleDelete = (category) => {
     setSelectedCategory(category);
     setShowConfirm(true);
   };
 
-  // Actualiza el estado del formulario cuando se edita un campo
   const handleFieldChange = (name, value) => {
     setFormFields((prevFields) =>
       prevFields.map(field =>
@@ -71,31 +76,35 @@ export default function Categories() {
     );
   };
 
-  // Guardar una categoría (crear o actualizar)
-  const handleSave = () => {
+  const handleSave = async () => {
     const categoryData = formFields.reduce((acc, field) => {
       acc[field.name] = field.value;
       return acc;
     }, {});
 
-    // Dependiendo del modo, crea o actualiza la categoría
-    if (mode === 'edit') {
-      CategoryService.update(selectedCategory.id, categoryData);
-    } else if (mode === 'add') {
-      CategoryService.create(categoryData);
+    try {
+      if (mode === 'edit') {
+        await CategoryService.update(selectedCategory.id, categoryData);
+      } else if (mode === 'add') {
+        await CategoryService.create(categoryData);
+      }
+      await loadCategories();
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error al guardar categoría:', error);
     }
-
-    setCategories([...CategoryService.getAll()]);
-    setShowForm(false);
   };
 
-  const confirmDelete = () => {
-    CategoryService.delete(selectedCategory.id);
-    setCategories([...CategoryService.getAll()]);
-    setShowConfirm(false);
+  const confirmDelete = async () => {
+    try {
+      await CategoryService.delete(selectedCategory.id);
+      await loadCategories();
+      setShowConfirm(false);
+    } catch (error) {
+      console.error('Error al eliminar categoría:', error);
+    }
   };
 
-  // Renderiza el componente completo
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">
@@ -103,17 +112,15 @@ export default function Categories() {
         <AddButton label="Agregar Categoría" onClick={handleAdd} />
       </div>
 
-      {/* Tabla que muestra las categorías */}
       <ListTable
         headers={tableHeaders}
         data={categories}
-        accordionHeaderKey={(item) => `${item.id} - ${item.name}`}
+        accordionHeaderKey={(item) => `${item.name} - ${item.description}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
 
-      {/* Modal para ver, agregar o editar una categoría */}
       <ModalForm
         show={showForm}
         onClose={() => setShowForm(false)}
@@ -123,7 +130,6 @@ export default function Categories() {
         onSave={handleSave}
       />
 
-      {/* Modal de confirmación de eliminación */}
       <ModalConfirmation
         show={showConfirm}
         onConfirm={confirmDelete}

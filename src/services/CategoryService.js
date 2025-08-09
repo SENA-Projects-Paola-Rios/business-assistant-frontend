@@ -1,26 +1,36 @@
-// Lista simulada de categorías para trabajar sin conexión a API
-
-const mockCategories = [
-  { id: 1, name: 'Bebidas', description: 'Productos líquidos como jugos, aguas y gaseosas' },
-  { id: 2, name: 'Lácteos', description: 'Productos derivados de la leche como yogur, queso, etc.' },
-];
-
-// Servicio simulado con funciones CRUD
+// src/services/CategoryService.js
+import api from './api'; // Importamos la instancia configurada con interceptores
 
 const CategoryService = {
-  getAll: () => mockCategories,
-  getById: (id) => mockCategories.find(c => c.id === id),
-  create: (category) => {
-    mockCategories.push({ id: mockCategories.length + 1, ...category });
+  // Obtener todas las categorías
+  getAll: async () => {
+    const response = await api.get('/categories');
+    return response.data;
   },
-  update: (id, category) => {
-    const index = mockCategories.findIndex(c => c.id === id);
-    if (index > -1) mockCategories[index] = { ...mockCategories[index], ...category };
+
+  // Obtener una categoría por ID
+  getById: async (id) => {
+    const response = await api.get(`/categories/${id}`);
+    return response.data;
   },
-  delete: (id) => {
-    const index = mockCategories.findIndex(c => c.id === id);
-    if (index > -1) mockCategories.splice(index, 1);
+
+  // Crear una categoría
+  create: async (categoryData) => {
+    const response = await api.post('/categories', categoryData);
+    return response.data;
   },
+
+  // Actualizar una categoría
+  update: async (id, categoryData) => {
+    const response = await api.put(`/categories/${id}`, categoryData);
+    return response.data;
+  },
+
+  // Eliminar una categoría
+  delete: async (id) => {
+    const response = await api.delete(`/categories/${id}`);
+    return response.data;
+  }
 };
 
 export default CategoryService;
