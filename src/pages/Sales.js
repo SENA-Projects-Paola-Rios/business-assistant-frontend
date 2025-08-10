@@ -1,77 +1,88 @@
+// src/pages/Sales.js
 import { useState, useEffect } from 'react';
+
+// Componentes
 import SectionTitle from '../components/SectionTitle';
 import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
 import ModalForm from '../components/ModalForm';
 import ModalConfirmation from '../components/ModalConfirmation';
 import SaleDetailModal from '../components/SaleDetailModal';
+
+// Servicios
 import SaleService from '../services/SalesService';
 import UserService from '../services/UserService';
 import SaleDetailService from '../services/SaleDetailService';
 
-
 export default function Sales() {
-  // Estado para almacenar la lista de ventas
+  /** ------------------------------
+   *  Estados
+   *  ------------------------------ */
   const [sales, setSales] = useState([]);
+  const [users, setUsers] = useState([]);
 
-  // Estado para la lista de usuarios (cargada una sola vez)
-  const [users] = useState(UserService.getAll());
+  // Formulario
+  const [selectedSale, setSelectedSale] = useState(null);
+  const [formFields, setFormFields] = useState([]);
+  const [mode, setMode] = useState('view');
+  const [showForm, setShowForm] = useState(false);
 
-  // Estados relacionados con el formulario
-  const [selectedSale, setSelectedSale] = useState(null); 
-  const [mode, setMode] = useState('view'); 
-  const [showForm, setShowForm] = useState(false); 
-  const [formFields, setFormFields] = useState([]); 
-
-  // Estados relacionados con la confirmación de eliminación
+  // Confirmación
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Estados para el modal de detalle de la venta
+  // Detalle de venta
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [detailData, setDetailData] = useState([]); // Detalles de la venta
+  const [detailData, setDetailData] = useState([]);
 
-  // Carga todas las ventas desde el servicio y actualiza el estado
-  const loadSales = () => {
-    setSales(SaleService.getAll());
-  };
-
-  // Efecto que carga las ventas una vez al montar el componente
+  /** ------------------------------
+   *  Efectos
+   *  ------------------------------ */
   useEffect(() => {
     loadSales();
+    loadUsers();
   }, []);
 
-  // Cabeceras de la tabla, incluyendo un botón personalizado para ver detalles
-  const tableHeaders = [
-    { key: 'id', label: 'ID' },
-    { key: 'sale_date', label: 'Fecha de Venta' },
-    { key: 'total', label: 'Total' },
-    { key: 'user_name', label: 'Usuario' },
-    {
-      key: 'detalle_btn',
-      label: 'Detalle',
-      render: (sale) => (
-        <button
-          className="btn btn-outline-info btn-sm"
-          onClick={() => handleViewDetails(sale.id)}
-        >
-          Ver Detalles
-        </button>
-      )
+  /** ------------------------------
+   *  Carga de datos
+   *  ------------------------------ */
+  const loadSales = async () => {
+    try {
+      const res = await SaleService.getAll();
+      setSales(res);
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
     }
-  ];
+  };
 
-  // Construye dinámicamente los campos del formulario a partir de una venta
+  const loadUsers = async () => {
+    try {
+      const res = await UserService.getAll();
+      setUsers(res);
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
+    }
+  };
+
+  UserService.getAll()
+
+  /** ------------------------------
+   *  Construcción de campos del formulario
+   *  ------------------------------ */
   const buildFormFields = (sale) => [
-    { name: 'sale_date', label: 'Fecha de Venta', type: 'date', value: sale.sale_date || '' },
+    { name: 'total', label: 'Total', type: 'number', value: sale.total || 0 },
+    { name: 'saleDate', label: 'Fecha de Venta', type: 'date', value: sale.saleDate || '' },
     {
-      name: 'user_id',
+      name: 'user',
       label: 'Usuario',
       type: 'select',
-      value: sale.user_id || '',
-      options: users.map(u => ({ value: u.id, label: u.nombre }))
+      value: sale.userId || '',
+      options: users.map(u => ({ value: u.id, label: u.name }))
     }
   ];
 
+  /** ------------------------------
+   *  Handlers de CRUD
+   *  ------------------------------ */
   const handleView = (sale) => {
     setSelectedSale(sale);
     setFormFields(buildFormFields(sale));
@@ -99,49 +110,90 @@ export default function Sales() {
     setShowConfirm(true);
   };
 
-  // Maneja cambios en los campos del formulario
   const handleFieldChange = (name, value) => {
     setFormFields(prevFields =>
       prevFields.map(field => field.name === name ? { ...field, value } : field)
     );
   };
 
-  const handleSave = () => {
-    // Convierte los campos del formulario a un objeto plano
-    const saleData = formFields.reduce((acc, field) => {
+  const handleSave = async () => {
+
+    let saleData = formFields.reduce((acc, field) => {
       acc[field.name] = field.value;
       return acc;
     }, {});
 
-    // Convierte el user_id a número y agrega el nombre del usuario
-    saleData.user_id = parseInt(saleData.user_id);
-    const user = users.find(u => u.id === saleData.user_id);
-    saleData.user_name = user?.nombre || '';
 
-    if (mode === 'edit') {
-      SaleService.update(selectedSale.id, saleData);
-    } else if (mode === 'add') {
-      SaleService.create(saleData);
+    saleData.user = { id: parseInt(saleData.user) };
+
+    try {
+      let response = {};
+      if (mode === 'edit') {
+        response = await SaleService.update(selectedSale.id, saleData);
+        if ('message' in response) {
+          alert(response.message);
+        }
+      } else if (mode === 'add') {
+        response = await SaleService.create(saleData);
+        if ('message' in response) {
+          alert(response.message);
+        }
+      }
+
+      await loadSales();
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error al guardar la venta:', error);
     }
-
-    loadSales();
-    setShowForm(false);
   };
 
-  const confirmDelete = () => {
-    SaleService.delete(selectedSale.id);
-    loadSales();
-    setShowConfirm(false);
+  const confirmDelete = async () => {
+    try {
+      let response = await SaleService.delete(selectedSale.id);
+      if ('message' in response) {
+        alert(response.message);
+      }
+      await loadSales();
+      setShowConfirm(false);
+    } catch (error) {
+      console.error('Error al eliminar la venta:', error);
+    }
   };
 
-  // Carga y muestra los detalles de una venta en un modal
+  /** ------------------------------
+   *  Detalle de ventas
+   *  ------------------------------ */
   const handleViewDetails = (saleId) => {
     const details = SaleDetailService.getBySaleId(saleId);
     setDetailData(details);
     setShowDetailModal(true);
   };
 
-  // Render del componente
+  /** ------------------------------
+   *  Cabeceras de tabla
+   *  ------------------------------ */
+  const tableHeaders = [
+    { key: 'id', label: 'ID' },
+    { key: 'saleDate', label: 'Fecha de Venta' },
+    { key: 'total', label: 'Total' },
+    { key: 'userName', label: 'Usuario' },
+    {
+      key: 'detalle_btn',
+      label: 'Detalle',
+      render: (sale) => (
+        <button
+          className="btn btn-outline-info btn-sm"
+          onClick={() => handleViewDetails(sale.id)}
+        >
+          Ver Detalles
+        </button>
+      )
+    }
+  ];
+
+  /** ------------------------------
+   *  Render
+   *  ------------------------------ */
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">
@@ -149,17 +201,15 @@ export default function Sales() {
         <AddButton label="Agregar Venta" onClick={handleAdd} />
       </div>
 
-      {/* Tabla de ventas con acordeón para móviles */}
       <ListTable
         headers={tableHeaders}
         data={sales}
-        accordionHeaderKey={(item) => `${item.id} - ${item.sale_date}`} // Encabezado del acordeón personalizado
+        accordionHeaderKey={(item) => `${item.id} - ${item.sale_date}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
 
-      {/* Modal de formulario para agregar, editar o ver venta */}
       <ModalForm
         show={showForm}
         onClose={() => setShowForm(false)}
@@ -173,7 +223,7 @@ export default function Sales() {
         show={showConfirm}
         onConfirm={confirmDelete}
         onCancel={() => setShowConfirm(false)}
-        message={`¿Está seguro que desea eliminar la venta del ${selectedSale?.sale_date}?`}
+        message={`¿Está seguro que desea eliminar la venta del ${selectedSale?.saleDate}?`}
       />
 
       <SaleDetailModal

@@ -1,23 +1,33 @@
 import { useState } from 'react';
+
+// Componentes
 import SectionTitle from '../components/SectionTitle';
 import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
 import ModalForm from '../components/ModalForm';
 import ModalConfirmation from '../components/ModalConfirmation';
+
+// Servicios
 import SaleDetailService from '../services/SaleDetailService';
 import LotService from '../services/LotService';
 
 export default function SaleDetails() {
+  /** ------------------------------
+   *  Estados
+   *  ------------------------------ */
   const [details, setDetails] = useState(SaleDetailService.getAll());
   const [lots] = useState(LotService.getAll());
 
   const [selectedDetail, setSelectedDetail] = useState(null);
+  const [formFields, setFormFields] = useState([]);
   const [mode, setMode] = useState('view');
+
   const [showForm, setShowForm] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [formFields, setFormFields] = useState([]);
 
-  // Encabezados de la tabla de detalles de venta
+  /** ------------------------------
+   *  Configuración de tabla
+   *  ------------------------------ */
   const tableHeaders = [
     { key: 'sale_id', label: 'ID Venta' },
     { key: 'lot_code', label: 'Código Lote' },
@@ -27,19 +37,16 @@ export default function SaleDetails() {
     { key: 'subtotal', label: 'Subtotal' },
   ];
 
-  // Construye los campos del formulario, asegurando que unit_price venga del lote
+  /** ------------------------------
+   *  Helper: construcción de formulario
+   *  ------------------------------ */
   const buildFormFields = (detail) => {
     const lot = LotService.getById(parseInt(detail.lot_id));
     const unitPrice = lot?.unit_price || 0;
     const subtotal = (detail.quantity || 0) * unitPrice;
 
     return [
-      {
-        name: 'sale_id',
-        label: 'ID Venta',
-        type: 'number',
-        value: detail.sale_id || ''
-      },
+      { name: 'sale_id', label: 'ID Venta', type: 'number', value: detail.sale_id || '' },
       {
         name: 'lot_id',
         label: 'Lote',
@@ -50,68 +57,43 @@ export default function SaleDetails() {
           label: `${l.manufacturer_lot} (${l.product_name})`
         }))
       },
-      {
-        name: 'quantity',
-        label: 'Cantidad',
-        type: 'number',
-        value: detail.quantity || 1
-      },
+      { name: 'quantity', label: 'Cantidad', type: 'number', value: detail.quantity || 1 },
       {
         name: 'unit_price',
         label: 'Precio Unitario',
         type: 'number',
         value: unitPrice,
-        attributes: {
-          readOnly: true,
-          tabIndex: -1,
-          style: {
-            pointerEvents: 'none',
-            backgroundColor: '#f9f9f9'
-          }
-        }
+        attributes: { readOnly: true, tabIndex: -1, style: { pointerEvents: 'none', backgroundColor: '#f9f9f9' } }
       },
       {
         name: 'subtotal',
         label: 'Subtotal',
         type: 'number',
         value: subtotal,
-        attributes: {
-          readOnly: true,
-          tabIndex: -1,
-          style: {
-            pointerEvents: 'none',
-            backgroundColor: '#f9f9f9'
-          }
-        }
+        attributes: { readOnly: true, tabIndex: -1, style: { pointerEvents: 'none', backgroundColor: '#f9f9f9' } }
       }
     ];
   };
 
-  // Ver detalle en modo solo lectura
+  /** ------------------------------
+   *  Handlers de CRUD
+   *  ------------------------------ */
   const handleView = (detail) => {
-    const updatedDetail = {
-      ...detail,
-      unit_price: LotService.getById(parseInt(detail.lot_id))?.unit_price || 0
-    };
+    const updated = { ...detail, unit_price: LotService.getById(parseInt(detail.lot_id))?.unit_price || 0 };
     setSelectedDetail(detail);
-    setFormFields(buildFormFields(updatedDetail));
+    setFormFields(buildFormFields(updated));
     setMode('view');
     setShowForm(true);
   };
 
-  // Editar detalle, asegurando precio correcto
   const handleEdit = (detail) => {
-    const updatedDetail = {
-      ...detail,
-      unit_price: LotService.getById(parseInt(detail.lot_id))?.unit_price || 0
-    };
+    const updated = { ...detail, unit_price: LotService.getById(parseInt(detail.lot_id))?.unit_price || 0 };
     setSelectedDetail(detail);
-    setFormFields(buildFormFields(updatedDetail));
+    setFormFields(buildFormFields(updated));
     setMode('edit');
     setShowForm(true);
   };
 
-  // Agregar nuevo detalle de venta
   const handleAdd = () => {
     const emptyDetail = { sale_id: '', lot_id: '', quantity: 1 };
     setSelectedDetail(emptyDetail);
@@ -120,51 +102,41 @@ export default function SaleDetails() {
     setShowForm(true);
   };
 
-  // Eliminar un detalle
   const handleDelete = (detail) => {
     setSelectedDetail(detail);
     setShowConfirm(true);
   };
 
-  // Manejo de cambios en los campos del formulario
+  /** ------------------------------
+   *  Manejo de cambios en el formulario
+   *  ------------------------------ */
   const handleFieldChange = (name, value) => {
     setFormFields(prev => {
-      let updated = prev.map(f =>
-        f.name === name ? { ...f, value } : f
-      );
+      let updated = prev.map(f => (f.name === name ? { ...f, value } : f));
 
-      // Si cambia el lote, actualizar unit_price
       if (name === 'lot_id') {
         const selectedLot = LotService.getById(parseInt(value));
         const newUnitPrice = selectedLot?.unit_price || 0;
-
-        updated = updated.map(f => {
-          if (f.name === 'unit_price') return { ...f, value: newUnitPrice };
-          return f;
-        });
+        updated = updated.map(f => f.name === 'unit_price' ? { ...f, value: newUnitPrice } : f);
       }
 
-      // Recalcular subtotal con los valores actuales
       const quantity = parseFloat(updated.find(f => f.name === 'quantity')?.value || 0);
       const unitPrice = parseFloat(updated.find(f => f.name === 'unit_price')?.value || 0);
       const subtotal = quantity * unitPrice;
 
-      updated = updated.map(f =>
-        f.name === 'subtotal' ? { ...f, value: subtotal } : f
-      );
-
-      return updated;
+      return updated.map(f => f.name === 'subtotal' ? { ...f, value: subtotal } : f);
     });
   };
 
-  // Guardar nuevo o editar detalle de venta
+  /** ------------------------------
+   *  Guardar cambios
+   *  ------------------------------ */
   const handleSave = () => {
     const formData = formFields.reduce((acc, field) => {
       acc[field.name] = field.value;
       return acc;
     }, {});
 
-    // Traer información actual del lote seleccionado
     const lot = LotService.getById(parseInt(formData.lot_id));
     const unitPrice = lot?.unit_price || 0;
 
@@ -188,13 +160,18 @@ export default function SaleDetails() {
     setShowForm(false);
   };
 
-  // Confirmar y ejecutar eliminación
+  /** ------------------------------
+   *  Confirmar eliminación
+   *  ------------------------------ */
   const confirmDelete = () => {
     SaleDetailService.delete(selectedDetail.sale_id, selectedDetail.lot_id);
     setDetails(SaleDetailService.getAll());
     setShowConfirm(false);
   };
 
+  /** ------------------------------
+   *  Render
+   *  ------------------------------ */
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">

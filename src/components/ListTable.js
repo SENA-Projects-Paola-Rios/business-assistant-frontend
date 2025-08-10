@@ -25,6 +25,9 @@ export default function ListTable({ headers, data, onView, onEdit, onDelete, acc
   const safeHeaders = Array.isArray(headers) ? headers : [];
   const safeData = Array.isArray(data) ? data : [];
 
+  console.log(headers)
+  console.log('data', data)
+
   return (
     <div>
       {/* Tabla tradicional para pantallas medianas y grandes */}

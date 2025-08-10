@@ -1,74 +1,48 @@
-// Lista simulada de detalles de venta con precios unitarios
-const mockSaleDetails = [
-  {
-    sale_id: 1,
-    lot_id: 1,
-    quantity: 3,
-    lot_code: 'LOT123ABC',
-    product_name: 'Jugo de Naranja',
-    unit_price: 2500
-  },
-  {
-    sale_id: 1,
-    lot_id: 2,
-    quantity: 2,
-    lot_code: 'LOT456DEF',
-    product_name: 'Leche Deslactosada',
-    unit_price: 3000
-  },
-  {
-    sale_id: 2,
-    lot_id: 2,
-    quantity: 1,
-    lot_code: 'LOT456DEF',
-    product_name: 'Leche Deslactosada',
-    unit_price: 3000
-  }
-];
+// src/services/SalesDetailService.js
+import api from './api'; // Importamos la instancia configurada con interceptores
 
-// Servicio simulado para operaciones sobre detalles de venta
-const SaleDetailService = {
-  getAll: () =>
-    mockSaleDetails.map((d) => ({
-      ...d,
-      subtotal: d.quantity * d.unit_price
-    })),
-
-  getBySaleId: (sale_id) =>
-    mockSaleDetails
-      .filter((d) => d.sale_id === sale_id)
-      .map((d) => ({
-        ...d,
-        subtotal: d.quantity * d.unit_price
-      })),
-
-  create: (detail) => {
-    detail.unit_price = parseFloat(detail.unit_price) || 0;
-    detail.subtotal = detail.quantity * detail.unit_price;
-    mockSaleDetails.push(detail);
+const SalesDetailService = {
+  // Obtener todos los detalles de venta
+  getAll: async () => {
+    const response = await api.get('/sale-details');
+    return response.data;
   },
 
-  update: (sale_id, lot_id, updatedDetail) => {
-    const index = mockSaleDetails.findIndex(
-      (d) => d.sale_id === sale_id && d.lot_id === lot_id
-    );
-    if (index > -1) {
-      const merged = {
-        ...mockSaleDetails[index],
-        ...updatedDetail
-      };
-      merged.unit_price = parseFloat(merged.unit_price) || 0;
-      merged.subtotal = merged.quantity * merged.unit_price;
-      mockSaleDetails[index] = merged;
-    }
+  // Obtener detalle por saleId y lotId
+  getBySaleIdAndLotId: async (saleId, lotId) => {
+    const response = await api.get(`/sale-details/sale/${saleId}/lot/${lotId}`);
+    return response.data;
   },
 
-  delete: (sale_id, lot_id) => {
-    const index = mockSaleDetails.findIndex(
-      (d) => d.sale_id === sale_id && d.lot_id === lot_id
-    );
-    if (index > -1) mockSaleDetails.splice(index, 1);
+  // Obtener detalles por lotId
+  getByLotId: async (lotId) => {
+    const response = await api.get(`/sale-details/lot/${lotId}`);
+    return response.data;
+  },
+
+  // Obtener detalles por saleId
+  getBySaleId: async (saleId) => {
+    const response = await api.get(`/sale-details/sale/${saleId}`);
+    return response.data;
+  },
+
+  // Obtener detalles por userId
+  getByUserId: async (userId) => {
+    const response = await api.get(`/sales/sale-details/${userId}`);
+    return response.data;
+  },
+
+  // Crear un detalle de venta
+  create: async (saleDetailData) => {
+    const response = await api.post('/sale-details', saleDetailData);
+    return response.data;
+  },
+
+  // Eliminar detalle de venta por saleId y lotId
+  delete: async (saleId, lotId) => {
+    const response = await api.delete(`/sale-details/sale/${saleId}/lot/${lotId}`);
+    return response.data;
   }
 };
 
-export default SaleDetailService;
+export default SalesDetailService;
