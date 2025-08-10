@@ -1,5 +1,5 @@
 // src/pages/Categories.js
-import { useState, useEffect } from 'react';
+import { React, useState, useEffect } from 'react';
 import SectionTitle from '../components/SectionTitle';
 import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
