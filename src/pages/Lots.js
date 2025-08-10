@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// src/pages/Lots.js
+import { useState, useEffect } from 'react';
 import SectionTitle from '../components/SectionTitle';
 import AddButton from '../components/AddButton';
 import ListTable from '../components/ListTable';
@@ -7,11 +8,9 @@ import ModalConfirmation from '../components/ModalConfirmation';
 import LotService from '../services/LotService';
 import ProductService from '../services/ProductService';
 
-// Componente principal para la gestión de lotes
 export default function Lots() {
-  
-  const [lots, setLots] = useState(LotService.getAll());
-  const [products] = useState(ProductService.getAll());
+  const [lots, setLots] = useState([]);
+  const [products, setProducts] = useState([]);
   const [selectedLot, setSelectedLot] = useState(null);
   const [mode, setMode] = useState('view');
 
@@ -23,26 +22,57 @@ export default function Lots() {
   // Encabezados de la tabla de lotes
   const tableHeaders = [
     { key: 'id', label: 'ID' },
-    { key: 'manufacturer_lot', label: 'Lote Fabricante' },
-    { key: 'expiration_date', label: 'Fecha de Vencimiento' },
+    { key: 'manufacturerLot', label: 'Lote Fabricante' },
+    { key: 'expirationDate', label: 'Fecha de Vencimiento' },
     { key: 'stock', label: 'Stock' },
-    { key: 'unit_price', label: 'Precio Unitario' }, 
-    { key: 'product_name', label: 'Producto' },
+    { key: 'productName', label: 'Producto' },
   ];
+
+  // Carga inicial de lotes y productos
+  useEffect(() => {
+    loadLots();
+    loadProducts();
+  }, []);
+
+  const loadLots = async () => {
+    try {
+      const res = await LotService.getAll();
+      // Mapeamos para adaptarlo a las keys usadas en la tabla (por ejemplo, productName)
+      const lotsWithProductName = res.map(lot => ({
+        id: lot.id,
+        manufacturerLot: lot.manufacturerLot,
+        expirationDate: lot.expirationDate,
+        stock: lot.stock,
+        productName: lot.productName || '',
+        productId: lot.productId || null,
+      }));
+      setLots(lotsWithProductName);
+    } catch (error) {
+      console.error('Error al cargar lotes:', error);
+    }
+  };
+
+  const loadProducts = async () => {
+    try {
+      const res = await ProductService.getAll();
+      setProducts(res);
+    } catch (error) {
+      console.error('Error al cargar productos:', error);
+    }
+  };
 
   // Construye campos para el formulario de lote
   const buildFormFields = (lot) => {
     return [
-      { name: 'manufacturer_lot', label: 'Lote Fabricante', type: 'text', value: lot.manufacturer_lot || '' },
-      { name: 'expiration_date', label: 'Fecha de Vencimiento', type: 'date', value: lot.expiration_date || '' },
+      { name: 'manufacturerLot', label: 'Lote Fabricante', type: 'text', value: lot.manufacturerLot || '' },
+      { name: 'expirationDate', label: 'Fecha de Vencimiento', type: 'date', value: lot.expirationDate || '' },
       { name: 'stock', label: 'Stock', type: 'number', value: lot.stock || 0 },
-      { name: 'unit_price', label: 'Precio Unitario', type: 'number', value: lot.unit_price || 0 }, // ✅ Campo agregado
       {
-        name: 'product_id',
+        name: 'productId',
         label: 'Producto',
         type: 'select',
-        value: lot.product_id || '',
-        options: products.map(p => ({ value: p.id, label: p.name }))
+        value: lot.productId || '',
+        options: products.map(p => ({ value: p.id, label: p.name })),
       },
     ];
   };
@@ -65,7 +95,7 @@ export default function Lots() {
 
   // Agregar nuevo
   const handleAdd = () => {
-    const emptyLot = { manufacturer_lot: '', expiration_date: '', stock: 0, unit_price: 0, product_id: '' };
+    const emptyLot = { manufacturerLot: '', expirationDate: '', stock: 0, unitPrice: 0, productId: '' };
     setSelectedLot(emptyLot);
     setFormFields(buildFormFields(emptyLot));
     setMode('add');
@@ -88,35 +118,48 @@ export default function Lots() {
   };
 
   // Guardar lote nuevo o actualizado
-  const handleSave = () => {
+  const handleSave = async () => {
     const lotData = formFields.reduce((acc, field) => {
-      // Convierte valores numéricos apropiadamente
       acc[field.name] = field.type === 'number' ? parseFloat(field.value) : field.value;
       return acc;
     }, {});
 
-    // Asegura que el product_id sea entero
-    lotData.product_id = parseInt(lotData.product_id, 10);
+    // Adaptar la estructura para backend (el producto debe ir anidado)
+    lotData.product = { id: parseInt(lotData.productId, 10) };
+    delete lotData.productId;
 
-    // Busca el nombre del producto para mostrarlo en la tabla
-    const product = products.find(p => p.id === lotData.product_id);
-    lotData.product_name = product?.name || '';
-
-    if (mode === 'edit') {
-      LotService.update(selectedLot.id, lotData);
-    } else if (mode === 'add') {
-      LotService.create(lotData);
+    try {
+      let response = {}
+      if (mode === 'edit') {
+        response = await LotService.update(selectedLot.id, lotData);
+        if ('message' in response) {
+          alert(response.message);
+        }
+      } else if (mode === 'add') {
+        response = await LotService.create(lotData);
+        if ('message' in response) {
+          alert(response.message);
+        }
+      }
+      await loadLots();
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error al guardar lote:', error);
     }
-
-    setLots([...LotService.getAll()]);
-    setShowForm(false);
   };
-  
+
   // Confirmar eliminación
-  const confirmDelete = () => {
-    LotService.delete(selectedLot.id);
-    setLots([...LotService.getAll()]);
-    setShowConfirm(false);
+  const confirmDelete = async () => {
+    try {
+      let response = await LotService.delete(selectedLot.id);
+      if ('message' in response) {
+          alert(response.message);
+        }
+      await loadLots();
+      setShowConfirm(false);
+    } catch (error) {
+      console.error('Error al eliminar lote:', error);
+    }
   };
 
   return (
@@ -129,7 +172,7 @@ export default function Lots() {
       <ListTable
         headers={tableHeaders}
         data={lots}
-        accordionHeaderKey={(item) => `${item.id} - ${item.manufacturer_lot}`}
+        accordionHeaderKey={(item) => `${item.id} - ${item.manufacturerLot}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -148,7 +191,7 @@ export default function Lots() {
         show={showConfirm}
         onConfirm={confirmDelete}
         onCancel={() => setShowConfirm(false)}
-        message={`¿Está seguro que desea eliminar el lote ${selectedLot?.manufacturer_lot}?`}
+        message={`¿Está seguro que desea eliminar el lote ${selectedLot?.manufacturerLot}?`}
       />
     </div>
   );

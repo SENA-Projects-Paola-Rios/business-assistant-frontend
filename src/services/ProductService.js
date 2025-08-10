@@ -1,44 +1,48 @@
-// Lista simulada de productos
-const mockProducts = [
-  {
-    id: 1,
-    name: 'Jugo de Naranja',
-    description: 'Botella de 1L de jugo natural sin azúcar',
-    price: 5500,
-    category_id: 1,
-    category_name: 'Bebidas',
-    lot_id: 1,
-    manufacturer_lot: 'LOT123ABC',
-    stock: 120,
-  },
-  {
-    id: 2,
-    name: 'Leche Deslactosada',
-    description: 'Caja de 1L de leche deslactosada',
-    price: 4800,
-    category_id: 2,
-    category_name: 'Lácteos',
-    lot_id: 2,
-    manufacturer_lot: 'LOT456DEF',
-    stock: 75,
-  },
-];
+// src/services/ProductService.js
+import api from './api'; // Instancia configurada con interceptores (incluye token, etc.)
 
-// Servicio simulado con funciones CRUD
 const ProductService = {
-  getAll: () => mockProducts,
-  getById: (id) => mockProducts.find(p => p.id === id),
-  create: (product) => {
-    mockProducts.push({ id: mockProducts.length + 1, ...product });
+  // Obtener todos los productos
+  getAll: async () => {
+    const response = await api.get('/products');
+    return response.data;
   },
-  update: (id, product) => {
-    const index = mockProducts.findIndex(p => p.id === id);
-    if (index > -1) mockProducts[index] = { ...mockProducts[index], ...product };
+
+  // Obtener un producto por ID
+  getById: async (id) => {
+    const response = await api.get(`/products/${id}`);
+    return response.data;
   },
-  delete: (id) => {
-    const index = mockProducts.findIndex(p => p.id === id);
-    if (index > -1) mockProducts.splice(index, 1);
+
+  // Crear un producto
+  create: async (productData) => {
+    const response = await api.post('/products', productData);
+    return response.data;
   },
+
+  // Actualizar un producto
+  update: async (id, productData) => {
+    const response = await api.put(`/products/${id}`, productData);
+    return response.data;
+  },
+
+  // Eliminar un producto
+  delete: async (id) => {
+    const response = await api.delete(`/products/${id}`);
+    return response.data;
+  },
+
+  // Registrar una categoria para un producto
+  addCategory: async(productCategoryData) => {
+    const response = await api.post('/product-categories', productCategoryData);
+    return response.data;
+  },
+
+  // Modificar una categoria para un producto
+  deleteCategory: async(productId) => {
+    const response = await api.delete(`/product-categories/product/${productId}/categories`);
+    return response.data;
+  }
 };
 
 export default ProductService;
