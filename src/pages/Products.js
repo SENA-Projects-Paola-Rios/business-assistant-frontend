@@ -85,7 +85,7 @@ export default function Products() {
         name: 'category_id',
         label: 'Categoría',
         type: 'select',
-        value: product.categories.length > 0 ? product.categories[0].id : '' || '',        
+        value: product.categories?.length > 0 ? product.categories[0].id : '' || '',        
         options: categories.map(c => ({ value: c.id, label: c.name }))
       },
     ];

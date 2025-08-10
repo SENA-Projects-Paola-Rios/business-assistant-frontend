@@ -63,7 +63,7 @@ export default function Sales() {
     }
   };
 
-  UserService.getAll()
+  
 
   /** ------------------------------
    *  Construcción de campos del formulario
