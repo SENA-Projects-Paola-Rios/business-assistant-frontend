@@ -30,7 +30,7 @@ export default function Categories() {
   const loadCategories = async () => {
     try {
       const res = await CategoryService.getAll();
-      setCategories(res);
+      setCategories(res.data);
     } catch (error) {
       console.error('Error al cargar categorías:', error);
     }
@@ -82,14 +82,38 @@ export default function Categories() {
       return acc;
     }, {});
 
+    let result = "";
     try {
       if (mode === 'edit') {
-        await CategoryService.update(selectedCategory.id, categoryData);
+        result = await CategoryService.update(selectedCategory.id, categoryData);
       } else if (mode === 'add') {
-        await CategoryService.create(categoryData);
+        result = await CategoryService.create(categoryData);
       }
-      await loadCategories();
-      setShowForm(false);
+
+      if (result.success) {
+        // Caso éxito
+        const message = result.data?.message || 'Successful operation!';
+        alert(message);
+        await loadCategories();
+        setShowForm(false);
+      } else {
+        // Caso error
+        let allErrors = '';
+
+        if (Array.isArray(result.data)) {
+          // Errores en array con defaultMessage
+          allErrors = result.data.map(err => err.defaultMessage).join('\n');
+        } else if (typeof result.data === 'object' && result.data !== null) {
+          // Errores en objeto con claves dinámicas
+          allErrors = Object.values(result.data).join('\n');
+        } else {
+          // Error inesperado
+          allErrors = 'Ocurrió un error inesperado';
+        }
+
+        alert(allErrors);
+      }
+
     } catch (error) {
       console.error('Error al guardar categoría:', error);
     }
@@ -97,9 +121,33 @@ export default function Categories() {
 
   const confirmDelete = async () => {
     try {
-      await CategoryService.delete(selectedCategory.id);
-      await loadCategories();
-      setShowConfirm(false);
+      let result = await CategoryService.delete(selectedCategory.id);
+
+      if (result.success) {
+        // Caso éxito
+        const message = result.data?.message || 'Successful operation!';
+        alert(message);
+        await loadCategories();
+        setShowConfirm(false);
+      } else {
+        // Caso error
+        let allErrors = '';
+
+        if (Array.isArray(result.data)) {
+          // Errores en array con defaultMessage
+          allErrors = result.data.map(err => err.defaultMessage).join('\n');
+        } else if (typeof result.data === 'object' && result.data !== null) {
+          // Errores en objeto con claves dinámicas
+          allErrors = Object.values(result.data).join('\n');
+        } else {
+          // Error inesperado
+          allErrors = 'Ocurrió un error inesperado';
+        }
+
+        alert(allErrors);
+      }
+
+
     } catch (error) {
       console.error('Error al eliminar categoría:', error);
     }

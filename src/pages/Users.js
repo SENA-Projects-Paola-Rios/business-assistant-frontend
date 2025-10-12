@@ -34,7 +34,8 @@ export default function Users() {
   const loadUsers = async () => {
     try {
       const res = await UserService.getAll();
-      setUsers(res); // Actualizamos estado con datos de la API
+      console.log(JSON.stringify(res))
+      setUsers(res.data); // Actualizamos estado con datos de la API
     } catch (error) {
       console.error('Error al cargar usuarios:', error);
     }
@@ -98,25 +99,74 @@ export default function Users() {
       return acc;
     }, {});
 
+    let result = "";
     try {
+      
       if (mode === 'edit') {
-        await UserService.update(selectedUser.id, userData);
+        result = await UserService.update(selectedUser.id, userData);
       } else if (mode === 'add') {
-        await UserService.create(userData);
+        result = await UserService.create(userData);
       }
-      await loadUsers(); // Recargamos lista desde la API
-      setShowForm(false);
+      
+      if (result.success) {
+        // Caso éxito
+        const message = result.data?.message || 'Successful operation!';
+        alert(message);
+        await loadUsers(); // Recargamos lista desde la API
+        setShowForm(false);
+      } else {
+        // Caso error
+        let allErrors = '';
+
+        if (Array.isArray(result.data)) {
+          // Errores en array con defaultMessage
+          allErrors = result.data.map(err => err.defaultMessage).join('\n');
+        } else if (typeof result.data === 'object' && result.data !== null) {
+          // Errores en objeto con claves dinámicas
+          allErrors = Object.values(result.data).join('\n');
+        } else {
+          // Error inesperado
+          allErrors = 'Ocurrió un error inesperado';
+        }
+
+        alert(allErrors);
+      }
+         
+      
     } catch (error) {
-      console.error('Error al guardar usuario:', error);
+      console.error('Unknown error:', error);      
     }
   };
 
   // Confirmar eliminación
   const confirmDelete = async () => {
     try {
-      await UserService.delete(selectedUser.id);
-      await loadUsers(); // Recargar lista
-      setShowConfirm(false);
+      let result = await UserService.delete(selectedUser.id);
+
+      if (result.success) {
+        // Caso éxito
+        const message = result.data?.message || 'Successful operation!';
+        alert(message);
+        await loadUsers(); // Recargar lista
+        setShowConfirm(false);
+      } else {
+        // Caso error
+        let allErrors = '';
+
+        if (Array.isArray(result.data)) {
+          // Errores en array con defaultMessage
+          allErrors = result.data.map(err => err.defaultMessage).join('\n');
+        } else if (typeof result.data === 'object' && result.data !== null) {
+          // Errores en objeto con claves dinámicas
+          allErrors = Object.values(result.data).join('\n');
+        } else {
+          // Error inesperado
+          allErrors = 'Ocurrió un error inesperado';
+        }
+
+        alert(allErrors);
+      }
+
     } catch (error) {
       console.error('Error al eliminar usuario:', error);
     }
