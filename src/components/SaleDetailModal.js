@@ -43,8 +43,8 @@ export default function SaleDetailModal({ show, onClose, details }) {
                   <tbody>
                     {detailsWithSubtotal.map((detail, idx) => (
                       <tr key={idx}>
-                        <td>{detail.lot_code}</td>
-                        <td>{detail.product_name}</td>
+                        <td>{detail.lotId}</td>
+                        <td>{detail.productName}</td>
                         <td>{detail.quantity}</td>
                         <td>${detail.subtotal.toFixed(2)}</td>
                       </tr>
