@@ -51,7 +51,7 @@ export default function Products() {
               categoryNames,
           };
       });
-
+      
       setProducts(productsWithCategories);
     } catch (error) {
       console.error('Error al cargar productos:', error);
@@ -61,7 +61,7 @@ export default function Products() {
   const loadCategories = async () => {
     try {
       const res = await CategoryService.getAll();
-      setCategories(res);
+      setCategories(res.data ?? []);
     } catch (error) {
       console.error('Error al cargar categorías:', error);
     }
@@ -77,6 +77,7 @@ export default function Products() {
   };
 
   const buildFormFields = (product) => {
+    
     return [
       { name: 'name', label: 'Nombre', type: 'text', value: product.name || '' },
       { name: 'description', label: 'Descripción', type: 'text', value: product.description || '' },
@@ -205,7 +206,7 @@ export default function Products() {
       <ListTable
         headers={tableHeaders}
         data={products}
-        accordionHeaderKey={(item) => `${item.name} - ${item.manufacturer_lot}`}
+        accordionHeaderKey={(item) => `${item.name} - ${item.categories[0]?.name ?? ''}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
