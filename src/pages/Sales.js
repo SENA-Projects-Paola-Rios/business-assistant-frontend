@@ -57,7 +57,7 @@ export default function Sales() {
   const loadUsers = async () => {
     try {
       const res = await UserService.getAll();
-      setUsers(res);
+      setUsers(res.data);
     } catch (error) {
       console.error('Error al cargar categorías:', error);
     }
@@ -163,10 +163,14 @@ export default function Sales() {
   /** ------------------------------
    *  Detalle de ventas
    *  ------------------------------ */
-  const handleViewDetails = (saleId) => {
-    const details = SaleDetailService.getBySaleId(saleId);
-    setDetailData(details);
-    setShowDetailModal(true);
+  const handleViewDetails = async (saleId) => {
+    try {
+      const details = await SaleDetailService.getBySaleId(saleId); 
+      setDetailData(details);
+      setShowDetailModal(true);
+    } catch (error) {
+      console.error("Error al obtener detalles de la venta:", error);
+    }
   };
 
   /** ------------------------------
@@ -204,7 +208,7 @@ export default function Sales() {
       <ListTable
         headers={tableHeaders}
         data={sales}
-        accordionHeaderKey={(item) => `${item.id} - ${item.sale_date}`}
+        accordionHeaderKey={(item) => `${item.id} - ${item.saleDate}`}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
